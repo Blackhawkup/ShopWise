@@ -36,4 +36,4 @@ resultsinDataFrame = pd.DataFrame(inspect(results), columns = ['Left Hand Side',
 resultsinDataFrame
 
 ## Displaying the results sorted by descending lifts
-resultsinDataFrame.nlargest(n = 10, columns = 'Lift')
+print(resultsinDataFrame.nlargest(n = 10, columns = 'Lift'))
