@@ -1,39 +1,34 @@
-# Apriori
-import os
-print(os.getcwd())  # This will show you where Python is looking for the file
-# Importing the libraries
+
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
-
-# Data Preprocessing
-dataset = pd.read_csv("Market_Basket_Optimisation.csv", header = None)
-transactions = []
-for i in range(0, 7501):
-  transactions.append([str(dataset.values[i,j]) for j in range(0, 20)])
-
-# Training the Apriori model on the dataset
+import os
 from apyori import apriori
-rules = apriori(transactions = transactions, min_support = 0.003, min_confidence = 0.2, min_lift = 3, min_length = 2, max_length = 2)
 
-# Visualising the results
+print("🔍 Current Working Directory:")
+print(os.getcwd())
 
-## Displaying the first results coming directly from the output of the apriori function
-results = list(rules)
-results
+# Load dataset
+file_path = './recommendation_model/Market_Basket_Optimisation.csv'
+print(f"📂 Checking file exists at: {file_path} → {os.path.exists(file_path)}")
 
-  ## Putting the results well organised into a Pandas DataFrame
-def inspect(results):
-    lhs         = [tuple(result[2][0][0])[0] for result in results]
-    rhs         = [tuple(result[2][0][1])[0] for result in results]
-    supports    = [result[1] for result in results]
-    confidences = [result[2][0][2] for result in results]
-    lifts       = [result[2][0][3] for result in results]
-    return list(zip(lhs, rhs, supports, confidences, lifts))
-resultsinDataFrame = pd.DataFrame(inspect(results), columns = ['Left Hand Side', 'Right Hand Side', 'Support', 'Confidence', 'Lift'])
+dataset = pd.read_csv(file_path, header=None)
 
-## Displaying the results non sorted
-resultsinDataFrame
+# Convert to transactions
+transactions = []
+for i in range(len(dataset)):
+    transactions.append([str(dataset.values[i,j]) for j in range(20) if str(dataset.values[i,j]) != 'nan'])
 
-## Displaying the results sorted by descending lifts
-print(resultsinDataFrame.nlargest(n = 10, columns = 'Lift'))
+print(f"🛒 Total transactions loaded: {len(transactions)}")
+
+# Run Apriori
+rules = list(apriori(transactions=transactions, min_support=0.003, min_confidence=0.2, min_lift=3, min_length=2, max_length=2))
+
+print(f"📊 Total rules generated: {len(rules)}")
+
+# Show sample rule if any
+if len(rules) > 0:
+    print("✅ First Rule Example:")
+    print(rules[0])
+else:
+    print("⚠️ No rules found. Try lowering support/confidence.")
+
